@@ -28,7 +28,7 @@ subroutine NoahMP50_main(n)
     use LIS_FORC_AttributesMod
     use NoahMP50_lsmMod
     use NoahmpIOVarType
-    use MicroTopoCorrectionMod, only : CalcSurfaceWaterStorage_mm ! (Chakraborty et al., 2026)
+    use MicroTopoCorrectionMod, only : CalcSurfaceWaterStorage_mm ! added by M. Bechtold, (2026)
 
     implicit none
 ! !ARGUMENTS:
@@ -223,7 +223,7 @@ subroutine NoahMP50_main(n)
             NoahmpIO%IOPT_BTR           = NoahMP50_struc(n)%btr_opt
             NoahmpIO%IOPT_RUNSRF        = NoahMP50_struc(n)%runsfc_opt
             NoahmpIO%IOPT_RUNSUB        = NoahMP50_struc(n)%runsub_opt
-            NoahmpIO%IOPT_PEAT          = NoahMP50_struc(n)%peat_opt    ! Chakraborty et al., (2025) 
+            NoahmpIO%IOPT_PEAT          = NoahMP50_struc(n)%peat_opt    ! added by A. Chakraborty (2025) 
             NoahmpIO%IOPT_SFC           = NoahMP50_struc(n)%sfc_opt
             NoahmpIO%IOPT_FRZ           = NoahMP50_struc(n)%frz_opt
             NoahmpIO%IOPT_INF           = NoahMP50_struc(n)%inf_opt
@@ -318,18 +318,7 @@ subroutine NoahMP50_main(n)
                NoahmpIO%nonriverxy(1,1)  = NoahMP50_struc(n)%noahmp50(t)%nonriver 
             endif
             
-            ! for peatland physics option (Chakraborty et al., 2025)
-            ! --- Apply PEAT physics only if soiltype == 17 and peat_opt == 1 ---
-            !if ( NoahMP50_struc(n)%peat_opt == 1 .and. NoahmpIO%isltyp(1,1) == 17 ) then
-            !    NoahmpIO%IOPT_PEAT = 1
-            !    write(LIS_logunit, *) "[INFO] PEAT physics applied for tile ", t, &
-            !              " (lat=", lat, ", lon=", lon, "), soiltype = 17"
-            !else 
-            !    NoahmpIO%IOPT_PEAT = 0
-            !endif
-            
-            
-            
+            ! for peatland physics option, added by A. Chakraborty (2025)
             if ( NoahMP50_struc(n)%peat_opt == 1 .and. NoahmpIO%isltyp(1,1) == 17 ) then
                 NoahmpIO%IOPT_PEAT = 1
                 write(LIS_logunit, *) "[INFO] PEAT physics applied for tile ", t, &
@@ -1073,7 +1062,7 @@ subroutine NoahMP50_main(n)
             if (NoahMP50_struc(n)%noahmp50(t)%wa.ge.0.0) then
                TWS_out = TWS_out + NoahMP50_struc(n)%noahmp50(t)%wa
             endif
-            ! add surface water storage for peatland option:
+            ! add surface water storage for peatland option (added by M. Bechtold, 2026):
             if ( NoahMP50_struc(n)%peat_opt == 1 .and. NoahmpIO%isltyp(1,1) == 17 ) then
                 call CalcSurfaceWaterStorage_mm(NoahMP50_struc(n)%noahmp50(t)%zwt, sfc_storage_mm)
                 TWS_out = TWS_out + sfc_storage_mm
